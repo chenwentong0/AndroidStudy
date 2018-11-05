@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div>
+    <h2>jsbridge_study</h2>
+    <br/>
+    请输入你要传递的内容
+    <br/>
+    <input id="inputid" type="text" class="input" placeholder="请输入传递给Android的内容" ref="inputref">
+    <br/>
+    <button id="btn" onclick="handleSend()">发送</button>
+    <br/>
+    <h2>显示安卓传递过来的内容</h2>
+    <br/>
+    <div id="androidref">安卓默认显示内容</div>
+</div>
+
+<script type="text/javascript">
+  var btn = document.getElementById('btn');
+  var inputid  = document.getElementById('inputid')
+  btn.addEventListener('click', function () {
+    var inputText = inputid.value
+    if (inputText != null) {
+      // 将输入的内容显示在客户端
+      if (window.myluncher != null) {
+        window.myluncher.setValue(inputText)
+      } else {
+        alert('myluncher not fund')
+      }
+    } else {
+      alert('请输入你要发送的内容')
+    }
+  }, false)
+
+  function callJS(value) {
+    <!--alert('android 调用js')-->
+    var androidref = document.getElementById('androidref')
+    androidref.innerHTML = value
+  }
+
+</script>
+</body>
+</html>

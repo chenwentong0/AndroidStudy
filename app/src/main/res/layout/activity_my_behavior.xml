@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.topsports.androidstudy.widget.SlideLayout
+        android:id="@+id/slide_layout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/coral"
+        app:sl_title_bg="@color/coral"/>
+
+    <com.topsports.androidstudy.widget.SlideLayout
+        android:id="@+id/slide_layout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:sl_title_bg="@color/colorAccent"
+        android:background="@color/colorAccent"
+        />
+
+    <!--<com.topsports.androidstudy.widget.SlideLayout-->
+        <!--android:id="@+id/slide_layout3"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:sl_title_bg="@color/gold"-->
+        <!--android:background="@color/gold"/>-->
+
+    <!--<com.topsports.androidstudy.widget.SlideLayout-->
+        <!--android:id="@+id/slide_layout4"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:sl_title_bg="@color/brown"-->
+        <!--android:background="@color/brown"/>-->
+</android.support.design.widget.CoordinatorLayout>
