@@ -9,12 +9,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="goBehavior"
+        android:visibility="gone"
         android:text="自定义behavior"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="goBottomSheetBehavior"
+        android:visibility="gone"
         android:text="BottomSheetBehavior"/>
 
     <Button
@@ -22,5 +24,18 @@
         android:layout_height="wrap_content"
         android:onClick="goPopupWindow"
         android:text="goPopupWindow"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_transparent">
+        <com.topsports.androidstudy.widget.picker.WheelDatePicker
+            android:id="@+id/wheel_date_picker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+        </com.topsports.androidstudy.widget.picker.WheelDatePicker>
+    </RelativeLayout>
 
 </LinearLayout>

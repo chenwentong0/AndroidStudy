@@ -8,91 +8,78 @@ import java.util.Calendar;
 import java.util.List;
 
 /**
- * 年份选择器
- * <p>
- * Picker for Years
- *
- * @author AigeStudio 2016-07-12
- * @version 1
+ * Created by wentong.chen on 2018/11/29.
  */
-public class WheelYearPicker extends WheelPicker implements IWheelYearPicker {
-    private int mYearStart = 1900, mYearEnd = 3000;
-    private int mSelectedYear;
 
+public class WheelYearPicker extends WheelPicker {
+    private int mYearStart = 1900, mYearEnd = 3000;
+    private int mYear;
     public WheelYearPicker(Context context) {
-        this(context, null);
+        super(context);
     }
 
     public WheelYearPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mYearEnd = Calendar.getInstance().get(Calendar.YEAR);
-        updateYears();
-        mSelectedYear = mYearEnd;
-        updateSelectedYear();
+        initDefault();
     }
 
-    private void updateYears() {
-        List<Integer> data = new ArrayList<>();
-        for (int i = mYearStart; i <= mYearEnd; i++)
-            data.add(i);
-        super.setData(data);
+    public void initDefault() {
+        mYear = WheelDatePicker.mDefaultYear;
+        setMinMax(WheelDatePicker.MIN_YEAR, WheelDatePicker.MAX_YEAR);
     }
 
-    private void updateSelectedYear() {
-        setSelectedItemPosition(mSelectedYear - mYearStart);
+
+    public void setMinValue(int minYear) {
+        this.mYearStart = minYear;
+        updateYear();
+        setSelectYear(mYear);
     }
 
-    @Override
-    public void setData(List data) {
-        throw new UnsupportedOperationException("You can not invoke setData in WheelYearPicker");
+    public void setMaxValue(int maxYear) {
+        this.mYearEnd = maxYear;
+        updateYear();
+        setSelectYear(mYear);
     }
 
-    @Override
-    public void setYearFrame(int start, int end) {
-        mYearStart = start;
-        mYearEnd = end;
-        mSelectedYear = getCurrentYear();
-        updateYears();
-        updateSelectedYear();
+    public void setMinMax(int min, int max) {
+        this.mYearStart = min;
+        this.mYearEnd = max;
+        updateYear();
+        setSelectYear(mYear);
     }
 
-    @Override
-    public int getYearStart() {
-        return mYearStart;
+    public void setSelectYear(int year) {
+        mYear = year;
+        setSelectedItemPosition(year - mYearStart > getData().size() - 1 ?
+                getData().size() -1 : year - mYearStart, false);
     }
 
-    @Override
-    public void setYearStart(int start) {
-        mYearStart = start;
-        mSelectedYear = getCurrentYear();
-        updateYears();
-        updateSelectedYear();
+    public int getSelectYear() {
+        return getSelectYear(getSelectedItemPosition());
     }
 
-    @Override
-    public int getYearEnd() {
-        return mYearEnd;
+    public int getSelectYear(int position) {
+        if (position < getData().size()) {
+            mYear = Integer.valueOf(getData().get(getSelectedItemPosition()).toString());
+        }
+        return mYear;
     }
 
     @Override
-    public void setYearEnd(int end) {
-        mYearEnd = end;
-        updateYears();
+    public void setSelectedItemPosition(int position, boolean anim) {
+        mYear = getSelectYear(position);
+        super.setSelectedItemPosition(position, anim);
     }
 
-    @Override
-    public int getSelectedYear() {
-        return mSelectedYear;
+    private void updateYear() {
+        List<Integer> list = new ArrayList<>();
+        for (int i = mYearStart; i <= mYearEnd; i++) {
+            list.add(i);
+        }
+        updateData(list);
     }
 
-    @Override
-    public void setSelectedYear(int year) {
-        mSelectedYear = year;
-        updateSelectedYear();
-    }
-
-    @Override
-    public int getCurrentYear() {
-        return Integer.valueOf(String.valueOf(getData().get(getCurrentItemPosition())));
+    public void updateData(List<Integer> years) {
+        super.setData(years);
     }
 }

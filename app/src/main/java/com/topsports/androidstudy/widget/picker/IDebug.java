@@ -3,8 +3,7 @@ package com.topsports.androidstudy.widget.picker;
 /**
  * 调试模式方法接口
  *
- * @author AigeStudio
- * @since 2011-04-11
+ * wentong.chen 2018.11.5
  */
 public interface IDebug {
     /**

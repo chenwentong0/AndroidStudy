@@ -28,23 +28,18 @@ import com.topsports.androidstudy.R;
 import java.util.Arrays;
 import java.util.List;
 
+
 /**
  * 滚轮选择器
  * <p>
  * WheelPicker
- *
- * @author AigeStudio 2015-12-12
- * @author AigeStudio 2016-06-17
- *         更新项目结构
- *         <p>
- *         New project structure
- * @version 1.1.0
+ * wentong.chen 2018.11.5
  */
 public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable {
     /**
      * 滚动状态标识值
      *
-     * @see OnWheelChangeListener#onWheelScrollStateChanged(int)
+     * @see OnWheelChangeListener#onWheelScrollStateChanged(WheelPicker, int)
      */
     public static final int SCROLL_STATE_IDLE = 0, SCROLL_STATE_DRAGGING = 1,
             SCROLL_STATE_SCROLLING = 2;
@@ -87,7 +82,7 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
     /**
      * 数据源
      */
-    private List mData;
+    protected List mData;
 
     /**
      * 最宽的文本
@@ -126,7 +121,7 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
      *
      * @see #setItemTextSize(int)
      */
-    private int mItemTextSize = 30;
+    private int mItemTextSize = ScreenUtils.sp2px(getContext(), 16);
 
     /**
      * 指示器尺寸
@@ -178,14 +173,14 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
      *
      * @see #setSelectedItemPosition(int)
      */
-    private int mSelectedItemPosition;
+    protected int mSelectedItemPosition;
 
     /**
      * 当前被选中的数据项所显示的数据在数据源中的位置
      *
      * @see #getCurrentItemPosition()
      */
-    private int mCurrentItemPosition;
+    protected int mCurrentItemPosition;
 
     /**
      * 滚轮滑动时可以滑动到的最小/最大的Y坐标
@@ -291,7 +286,7 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
 
     private boolean isDebug;
     protected String dateItemUnit = "";
-    private int mSelectSize = 40;
+    private int mNormalTextSize = mItemTextSize;
 
     public WheelPicker(Context context) {
         this(context, null);
@@ -306,6 +301,8 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
                 .getStringArray(idData == 0 ? R.array.WheelArrayDefault : idData));
         mItemTextSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_item_text_size,
                 getResources().getDimensionPixelSize(R.dimen.WheelItemTextSize));
+        mNormalTextSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_normal_item_text_size,
+                mItemTextSize);
         mVisibleItemCount = a.getInt(R.styleable.WheelPicker_wheel_visible_item_count, 7);
         mSelectedItemPosition = a.getInt(R.styleable.WheelPicker_wheel_selected_item_position, 0);
         hasSameWidth = a.getBoolean(R.styleable.WheelPicker_wheel_same_width, false);
@@ -551,7 +548,7 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
     @Override
     protected void onDraw(Canvas canvas) {
         if (null != mOnWheelChangeListener)
-            mOnWheelChangeListener.onWheelScrolled(mScrollOffsetY);
+            mOnWheelChangeListener.onWheelScrolled(this, mScrollOffsetY);
         int drawnDataStartPos = -mScrollOffsetY / mItemHeight - mHalfDrawnItemCount;
         for (int drawnDataPos = drawnDataStartPos + mSelectedItemPosition,
              drawnOffsetPos = -mHalfDrawnItemCount;
@@ -635,7 +632,7 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
 
             // 判断是否需要为当前数据项绘制不同颜色
             // Judges need to draw different color for current item or not
-            mPaint.setTextSize(mSelectSize);
+            mPaint.setTextSize(mNormalTextSize);
             if (mSelectedItemTextColor != -1) {
                 canvas.save();
                 if (isCurved) canvas.concat(mMatrixRotate);
@@ -655,7 +652,7 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
                 canvas.clipRect(mRectDrawn);
                 if (isCurved) canvas.concat(mMatrixRotate);
                 ColorMatrix colorMatrix = new ColorMatrix();
-                colorMatrix.setScale(0.5f, 0.5f, 0.5f, 0.5f);
+                colorMatrix.setScale(1f, 1f, 1f, 1f);
                 mPaint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
                 canvas.drawText(data, mDrawnCenterX, drawnCenterY, mPaint);
                 canvas.restore();
@@ -738,7 +735,7 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
                 isClick = false;
                 mTracker.addMovement(event);
                 if (null != mOnWheelChangeListener)
-                    mOnWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_DRAGGING);
+                    mOnWheelChangeListener.onWheelScrollStateChanged(this, SCROLL_STATE_DRAGGING);
 
                 // 滚动内容
                 // Scroll WheelPicker's content
@@ -817,15 +814,18 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
                 Log.i(TAG, position + ":" + mData.get(position) + ":" + mScrollOffsetY);
             mCurrentItemPosition = position;
             if (null != mOnItemSelectedListener && isTouchTriggered)
+//                setSelectedItemPosition(mCurrentItemPosition, false);
                 mOnItemSelectedListener.onItemSelected(this, mData.get(position), position);
             if (null != mOnWheelChangeListener && isTouchTriggered) {
-                mOnWheelChangeListener.onWheelSelected(position);
-                mOnWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_IDLE);
+                setSelectedItemPosition(mCurrentItemPosition, false);
+                System.out.println("选中mCurrentItemPosition = " + mCurrentItemPosition + " mSelectedItemPosition = " + mSelectedItemPosition);
+                mOnWheelChangeListener.onWheelSelected(this, position);
+                mOnWheelChangeListener.onWheelScrollStateChanged(this, SCROLL_STATE_IDLE);
             }
         }
         if (mScroller.computeScrollOffset()) {
             if (null != mOnWheelChangeListener)
-                mOnWheelChangeListener.onWheelScrollStateChanged(SCROLL_STATE_SCROLLING);
+                mOnWheelChangeListener.onWheelScrollStateChanged(this, SCROLL_STATE_SCROLLING);
             mScrollOffsetY = mScroller.getCurrY();
             postInvalidate();
             mHandler.postDelayed(this, 16);
@@ -912,6 +912,7 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
         return mData;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void setData(List data) {
         if (null == data)
@@ -919,16 +920,20 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
         mData = data;
 
         // 重置位置
-        if (mSelectedItemPosition > data.size() - 1 || mCurrentItemPosition > data.size() - 1) {
-            mSelectedItemPosition = mCurrentItemPosition = data.size() - 1;
-        } else {
-            mSelectedItemPosition = mCurrentItemPosition;
-        }
+        onSetData();
         mScrollOffsetY = 0;
         computeTextSize();
         computeFlingLimitY();
         requestLayout();
         invalidate();
+    }
+
+    protected void onSetData() {
+        if (mSelectedItemPosition > mData.size() - 1 || mCurrentItemPosition > mData.size() - 1) {
+            mSelectedItemPosition = mCurrentItemPosition = mData.size() - 1;
+        } else {
+            mSelectedItemPosition = mCurrentItemPosition = 0;
+        }
     }
 
     public void setSameWidth(boolean hasSameWidth) {
@@ -1016,9 +1021,9 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
         invalidate();
     }
 
-    public void setSelectTextSize(int size) {
-        mSelectSize = size;
-        mPaint.setTextSize(mSelectSize);
+    public void setNormalItemSize(int size) {
+        mNormalTextSize = size;
+        mPaint.setTextSize(mNormalTextSize);
         computeTextSize();
         requestLayout();
         invalidate();
@@ -1158,7 +1163,7 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
      *         新项目结构
      * @version 1.1.0
      */
-    public interface OnItemSelectedListener {
+    public interface OnItemSelectedListener<T> {
         /**
          * 当滚轮选择器数据项被选中时回调该方法
          * 滚动选择器滚动停止后会回调该方法并将当前选中的数据和数据在数据列表中对应的位置返回
@@ -1167,7 +1172,7 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
          * @param data     当前选中的数据
          * @param position 当前选中的数据在数据列表中的位置
          */
-        void onItemSelected(WheelPicker picker, Object data, int position);
+        void onItemSelected(WheelPicker picker, T data, int position);
     }
 
     /**
@@ -1194,7 +1199,7 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
          *               <p>
          *               Distance offset which between current scroll position and initial position
          */
-        void onWheelScrolled(int offset);
+        void onWheelScrolled(WheelPicker wheelPicker, int offset);
 
         /**
          * 当滚轮选择器停止后回调该方法
@@ -1208,7 +1213,7 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
          *                 <p>
          *                 Current selected item data's position in list
          */
-        void onWheelSelected(int position);
+        void onWheelSelected(WheelPicker wheelPicker, int position);
 
         /**
          * 当滚轮选择器滚动状态改变时回调该方法
@@ -1234,6 +1239,6 @@ public class WheelPicker extends View implements IWheelPicker, IDebug, Runnable 
          *              {@link WheelPicker#SCROLL_STATE_SCROLLING}
          *              Express WheelPicker in state of scrolling
          */
-        void onWheelScrollStateChanged(int state);
+        void onWheelScrollStateChanged(WheelPicker wheelPicker, int state);
     }
 }

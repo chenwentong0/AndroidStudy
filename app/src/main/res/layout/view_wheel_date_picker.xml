@@ -11,10 +11,14 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:paddingLeft="50dp"
+        android:paddingRight="20dp"
+        app:wheel_indicator_size="2dp"
+        app:wheel_indicator="true"
+        app:wheel_indicator_color="@color/red"
         app:wheel_curved="true"
         app:wheel_item_space="30dp"
         app:wheel_visible_item_count="5"
+        app:wheel_item_align="right"
         app:wheel_selected_item_text_color="@color/black"
         />
 
@@ -24,8 +28,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:wheel_curved="true"
+        app:wheel_indicator_size="2dp"
+        app:wheel_indicator="true"
+        app:wheel_indicator_color="@color/red"
         app:wheel_item_space="30dp"
         app:wheel_visible_item_count="5"
+        app:wheel_item_align="center"
         app:wheel_selected_item_text_color="@color/black"
         />
 
@@ -35,8 +43,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:paddingRight="50dp"
+        android:paddingLeft="20dp"
+        app:wheel_indicator_size="2dp"
+        app:wheel_indicator="true"
+        app:wheel_indicator_color="@color/red"
         app:wheel_curved="true"
+        app:wheel_item_align="left"
         app:wheel_item_space="30dp"
         app:wheel_visible_item_count="5"
         app:wheel_selected_item_text_color="@color/black"/>

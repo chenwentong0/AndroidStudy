@@ -7,114 +7,141 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * 日期选择器
- * <p>
- * Picker for Day
- *
- * @author AigeStudio 2016-07-12
- * @version 1
+ * Created by wentong.chen on 2018/11/29.
  */
-public class WheelDayPicker extends WheelPicker implements IWheelDayPicker {
-    private static final Map<Integer, List<Integer>> DAYS = new HashMap<>();
 
-    private Calendar mCalendar;
-
-    private int mYear, mMonth;
-    private int mSelectedDay;
-    private Calendar curCalendar;
+public class WheelDayPicker extends WheelPicker {
+    private Calendar mCalendar = Calendar.getInstance();
+    private int mStartDay = 1, mEndDay = 31;
+    private int mYear;
+    private int mMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
+    private HashMap<String, List<String>> DAYS = new HashMap<>();
+    private int mMinYear = 1900;
+    private int mMinMonth;
+    private int mMaxYear;
+    private int mMaxMonth;
+    private int mMinDay;
+    private int mMaxDay;
+    private int mDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 
     public WheelDayPicker(Context context) {
-        this(context, null);
+        super(context);
     }
 
     public WheelDayPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-        mCalendar = Calendar.getInstance();
-
-        mYear = mCalendar.get(Calendar.YEAR);
-        mMonth = mCalendar.get(Calendar.MONTH);
-        curCalendar = Calendar.getInstance();
-        updateDays();
-
-        mSelectedDay = mCalendar.get(Calendar.DAY_OF_MONTH);
-
-        updateSelectedDay();
+        initDefault();
     }
 
-    private void updateDays() {
+    public void initDefault() {
+        mYear = WheelDatePicker.mDefaultYear;
+        mMonth = WheelDatePicker.mDefaultMonth;
+        mDay = WheelDatePicker.mDefaultDay;
         mCalendar.set(Calendar.YEAR, mYear);
-        mCalendar.set(Calendar.MONTH, mMonth);
-        int days;
-        if (mYear == curCalendar.get(Calendar.YEAR) && mMonth >= curCalendar.get(Calendar.MONTH)) {
-            days = curCalendar.get(Calendar.DAY_OF_MONTH);
-        } else {
-            days = mCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);//获取指定日期的当月总天数
+        mCalendar.set(Calendar.MONTH, mMonth - 1);
+        initMinMaxValue(WheelDatePicker.MIN_YEAR, WheelDatePicker.MIN_MONTH, WheelDatePicker.MIN_DAY,
+                WheelDatePicker.MAX_YEAR, WheelDatePicker.MAX_MONTH, WheelDatePicker.MAX_DAY);
+    }
+
+    private void initMinMaxValue(int minYear, int minMonth, int minDay, int maxYear, int maxMonth, int maxDay) {
+        this.mMinYear = minYear;
+        this.mMinMonth = minMonth;
+        this.mMinDay = minDay;
+        this.mMaxYear = maxYear;
+        this.mMaxMonth = maxMonth;
+        this.mMaxDay = maxDay;
+        updateDay();
+        setYearMonthDay(mYear, mMonth, mDay);
+    }
+
+    public void setMinValue(int minYear, int minMonth, int minDay) {
+        this.mMinYear = minYear;
+        this.mMinMonth = minMonth;
+        this.mMinDay = minDay;
+        mYear = mYear < minYear ? minYear : mYear;
+        mMaxYear = mMaxYear < minYear ? minYear : mMaxYear;
+        updateDay();
+        setYearMonthDay(mYear, mMonth, mDay);
+    }
+
+    public void setMaxValue(int maxYear, int maxMonth, int maxDay) {
+        this.mMaxYear = maxYear;
+        this.mMaxMonth = maxMonth;
+        this.mMaxDay = maxDay;
+        mMinYear = mMinYear > maxYear ? maxYear : mMinYear;
+        mYear = mYear > maxYear ? maxYear : mYear;
+        updateDay();
+        setYearMonthDay(mYear, mMonth, mDay);
+    }
+
+    public void setYear(int year) {
+        setYearMonth(year, mMonth);
+    }
+
+    public void setYearMonth(int year, int month) {
+        setYearMonthDay(year, month, mDay);
+    }
+
+    public void setYearMonthDay(int year, int month, int day) {
+        this.mYear = year;
+        this.mMonth = month;
+        mDay = day;
+        updateDay();
+        setSelectedItemPosition(day - mStartDay >= getData().size() ?
+                getData().size() -1 : day - mStartDay, false);
+    }
+
+    public int getSelectDay() {
+        return getSelectDay(getSelectedItemPosition());
+    }
+
+    public int getSelectDay(int position) {
+        if (position < getData().size()) {
+            mDay = Integer.valueOf(getData().get(getSelectedItemPosition()).toString());
         }
-        List<Integer> data = DAYS.get(days);
+        return mDay;
+    }
+
+    @Override
+    public void setSelectedItemPosition(int position, boolean anim) {
+        mDay = getSelectDay(position);
+        super.setSelectedItemPosition(position,anim);
+    }
+
+    public void updateDay() {
+        mCalendar.set(Calendar.YEAR, mYear);
+        mCalendar.set(Calendar.MONTH, mMonth - 1);
+        mStartDay = 1;
+//        if (mYear == Calendar.getInstance().get(Calendar.YEAR) && mMonth == Calendar.getInstance().get(Calendar.MONTH) + 1) {
+//            mEndDay = mCalendar.get(Calendar.DAY_OF_MONTH);
+//        } else {
+//
+//        }
+        //获取指定日期的当月总天数
+        mEndDay = mCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        if (mMonth == 2 && mYear % 4 == 0) {
+            mEndDay = 29;
+        } else if (mMonth == 2){
+            mEndDay = 28;
+        }
+        if (mMinYear == mYear && mMinMonth == mMonth && mMinDay > 0) {
+            mStartDay = mMinDay;
+        }
+        if (mMaxYear == mYear && mMaxMonth == mMonth && mMaxDay > 0 && mMaxDay < mEndDay) {
+            mEndDay = mMaxDay;
+        }
+        String dayStr = (mEndDay - mStartDay) + "-" + mStartDay + "-" + mEndDay;
+        List<String> data = DAYS.get(dayStr);
         if (null == data) {
             data = new ArrayList<>();
-            for (int i = 1; i <= days; i++)
-                data.add(i);
-            DAYS.put(days, data);
+            for (int i = mStartDay; i <= mEndDay; i++) {
+                data.add(i < 10 ? "0" + i : "" + i);
+            }
+            DAYS.put(dayStr, data);
         }
+        System.out.println("mYear = "  + mYear + "mMonth = " + mMonth + " 天数 ；" + data.size());
         super.setData(data);
-    }
-
-    private void updateSelectedDay() {
-        setSelectedItemPosition(mSelectedDay - 1);
-    }
-
-    @Override
-    public void setData(List data) {
-        throw new UnsupportedOperationException("You can not invoke setData in WheelDayPicker");
-    }
-
-    @Override
-    public int getSelectedDay() {
-        return mSelectedDay;
-    }
-
-    @Override
-    public void setSelectedDay(int day) {
-        mSelectedDay = day;
-        updateSelectedDay();
-    }
-
-    @Override
-    public int getCurrentDay() {
-        return Integer.valueOf(String.valueOf(getData().get(getCurrentItemPosition())));
-    }
-
-    @Override
-    public void setYearAndMonth(int year, int month) {
-        mYear = year;
-        mMonth = month - 1;
-        updateDays();
-    }
-
-    @Override
-    public int getYear() {
-        return mYear;
-    }
-
-    @Override
-    public void setYear(int year) {
-        mYear = year;
-        updateDays();
-    }
-
-    @Override
-    public int getMonth() {
-        return mMonth;
-    }
-
-    @Override
-    public void setMonth(int month) {
-        mMonth = month - 1;
-        updateDays();
     }
 }

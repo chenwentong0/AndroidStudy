@@ -48,16 +48,16 @@ public class PopupActivity extends AppCompatActivity implements View.OnClickList
 ////        popupWindow.setFocusable(true);
 ////        popupWindow.setBackgroundDrawable(new BitmapDrawable());
 ////        popupWindow.showAsDropDown(v);
-        SetAgeDialog setAgeDialog = new SetAgeDialog(this, 2006, 6, 22);
-        setAgeDialog.setOnConfirmListener(new SetAgeDialog.OnConfirmListener() {
-            @Override
-            public void confirmDate(int year, int month, int day, int age, Date date) {
-                //TODO 设置生日成功
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                String dateString = formatter.format(date);
-            }
-        })
-                .show();
+//        SetAgeDialog setAgeDialog = new SetAgeDialog(this, 2006, 6, 22);
+//        setAgeDialog.setOnConfirmListener(new SetAgeDialog.OnConfirmListener() {
+//            @Override
+//            public void confirmDate(int year, int month, int day, int age, Date date) {
+//                //TODO 设置生日成功
+//                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+//                String dateString = formatter.format(date);
+//            }
+//        })
+//                .show();
 //        BaseConfirmDialog baseConfirmDialog = new BaseConfirmDialog(this);
 //        baseConfirmDialog.show();
 

@@ -6,17 +6,8 @@ import java.util.List;
 
 /**
  * 滚轮选择器方法接口
- * <p>
- * Interface of WheelPicker
  *
- * @author AigeStudio 2015-12-03
- * @author AigeStudio 2015-12-08
- * @author AigeStudio 2015-12-12
- * @author AigeStudio 2016-06-17
- *         更新项目结构
- *         <p>
- *         New project structure
- * @version 1.1.0
+ * wentong.chen 2018.11.5
  */
 public interface IWheelPicker {
 
